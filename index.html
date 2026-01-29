@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Corporate Dashboard | Security</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    .loader { border-top-color: #3b82f6; animation: spinner 1.5s linear infinite; }
+    @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .animate-fadeIn { animation: fadeIn 0.3s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    
+    details summary::-webkit-details-marker { display: none; }
+    .group-tooltip .tooltip-content { display: none; white-space: pre-wrap; }
+    .group-tooltip:hover .tooltip-content { display: block; }
+
+    /* 보안 코드 입력 스타일 */
+    .security-input {
+      letter-spacing: 0.5em;
+      text-align: center;
+      font-weight: 900;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+
+  <!-- 보안 인증 화면 -->
+  <div id="security-screen" class="fixed inset-0 z-[200] flex items-center justify-center bg-slate-900">
+    <div class="bg-white p-10 rounded-[2.5rem] shadow-2xl w-full max-w-sm text-center animate-fadeIn">
+      <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+        <i class="fas fa-lock text-2xl"></i>
+      </div>
+      <h2 class="text-2xl font-black text-slate-800 mb-2">보안 인증</h2>
+      <p class="text-sm text-slate-500 mb-8 font-medium">관리자용 보안코드를 입력해 주세요.</p>
+      
+      <div class="space-y-4">
+        <input type="password" id="passcode-input" maxlength="4" inputmode="numeric"
+          class="security-input w-full py-4 bg-slate-100 border-2 border-transparent focus:border-blue-500 focus:bg-white rounded-2xl outline-none transition-all text-2xl" 
+          placeholder="••••" onkeyup="handlePasscodeKeyUp(event)">
+        
+        <p id="security-error" class="text-xs text-red-500 font-bold hidden">코드가 일치하지 않습니다. 다시 입력하세요.</p>
+        
+        <button onclick="verifyPasscode()" 
+          class="w-full py-4 bg-blue-600 text-white rounded-2xl font-bold hover:bg-blue-700 active:scale-95 transition-all shadow-lg shadow-blue-200">
+          인증하기
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 메인 대시보드 (인증 후 노출) -->
+  <div id="main-content" class="hidden">
+    <div id="loading" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white">
+      <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
+      <h2 class="text-xl font-semibold text-slate-700">실시간 데이터 연동 중...</h2>
+      <p id="env-msg" class="mt-4 text-sm text-slate-400 px-6 text-center tracking-tight">공유 설정이 '링크가 있는 모든 사용자에게 공개' 상태여야 합니다.</p>
+    </div>
+
+    <nav class="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16 items-center">
+          <div class="flex items-center space-x-2">
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-sm">
+              <i class="fas fa-chart-line"></i>
+            </div>
+            <span class="text-xl font-bold tracking-tighter text-slate-800">CorpDash <span class="text-blue-600 font-black">PRO</span></span>
+          </div>
+          <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50 px-3 py-1 rounded-full border border-slate-100">Admin Mode</div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div id="tab-search" class="tab-content animate-fadeIn">
+        <div class="flex flex-col items-center justify-center min-h-[45vh] text-center">
+          <h1 class="text-4xl font-black text-slate-900 mb-4 tracking-tight">통합 기업 정보 검색</h1>
+          <p class="text-slate-500 mb-10 max-w-lg text-lg leading-relaxed">기업명 검색 또는 하단 드롭다운 필터를 통해 명단을 추출하세요.</p>
+          
+          <div class="w-full max-w-3xl space-y-6">
+            <!-- 검색바 -->
+            <div class="relative group">
+              <input type="text" id="main-search-input" onkeyup="handleQuickSearch()" 
+                class="w-full pl-14 pr-4 py-5 bg-white border-2 border-slate-200 rounded-3xl shadow-2xl focus:ring-8 focus:ring-blue-50 focus:border-blue-500 outline-none transition-all text-xl font-semibold" 
+                placeholder="기업명을 입력하세요 (F열 기준 매칭)">
+              <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 text-2xl group-focus-within:text-blue-500 transition-colors"></i>
+            </div>
+
+            <!-- 핵심 필터 (C, E, G) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div class="flex flex-col text-left space-y-1.5">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">25년 참여여부 (C)</label>
+                <select id="filter-c" onchange="handleQuickSearch()" class="w-full bg-white border-2 border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all cursor-pointer shadow-sm appearance-none">
+                  <option value="">전체보기</option>
+                </select>
+              </div>
+              <div class="flex flex-col text-left space-y-1.5">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">본신청단계 (E)</label>
+                <select id="filter-e" onchange="handleQuickSearch()" class="w-full bg-white border-2 border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all cursor-pointer shadow-sm appearance-none">
+                  <option value="">전체보기</option>
+                </select>
+              </div>
+              <div class="flex flex-col text-left space-y-1.5">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest pl-1">우선지원대상 (G)</label>
+                <select id="filter-g" onchange="handleQuickSearch()" class="w-full bg-white border-2 border-slate-100 p-4 rounded-2xl text-sm font-bold outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-500 transition-all cursor-pointer shadow-sm appearance-none">
+                  <option value="">전체보기</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div id="quick-results" class="mt-16 w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 hidden"></div>
+          <div id="search-empty" class="mt-16 hidden text-slate-400 font-bold">
+            <i class="fas fa-search-minus text-3xl mb-3 opacity-20"></i>
+            <p>검색 조건과 일치하는 기업이 없습니다.</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 상세 모달 -->
+    <div id="modal-overlay" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-md hidden flex items-center justify-center p-4">
+      <div class="bg-white w-full max-w-4xl rounded-[2.5rem] shadow-2xl max-h-[92vh] overflow-hidden flex flex-col animate-fadeIn">
+        <div class="p-8 border-b border-slate-100 flex justify-between items-start bg-white">
+          <div class="flex flex-col gap-2 text-left">
+            <div id="modal-title" class="text-2xl font-black text-slate-900 flex flex-wrap items-center gap-3"></div>
+            <div id="modal-subtitle" class="text-sm text-slate-500 font-medium italic border-l-4 border-blue-500 pl-4 py-1.5 bg-blue-50/50 rounded-r-xl"></div>
+          </div>
+          <button onclick="closeModal()" class="text-slate-300 hover:text-slate-900 transition-colors p-3 bg-slate-50 rounded-full shadow-inner"><i class="fas fa-times text-xl"></i></button>
+        </div>
+        <div id="modal-content-container" class="overflow-y-auto custom-scrollbar flex-1 bg-white text-left">
+          <div id="modal-special-section" class="px-8 py-8 bg-blue-600/[0.03] grid grid-cols-1 md:grid-cols-2 gap-4 hidden border-b border-blue-50">
+            <div class="md:col-span-2">
+              <h4 class="text-[11px] font-black text-blue-600 uppercase tracking-[0.2em] mb-4 flex items-center">
+                <span class="w-6 h-[2px] bg-blue-600 mr-2"></span> 2025 참여 데이터 지표 (AF~AG)
+              </h4>
+            </div>
+            <div id="special-data-container" class="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+          </div>
+          <div id="modal-content" class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6 text-left"></div>
+          <div class="px-8 border-t border-slate-100">
+            <details class="group py-6">
+              <summary class="flex items-center justify-between cursor-pointer list-none font-black text-sm text-slate-700 uppercase tracking-wide">
+                <span>다른연락처 정보 (X열 ~ AB열)</span><i class="fas fa-chevron-down text-slate-300 group-open:rotate-180 transition-transform"></i>
+              </summary>
+              <div id="toggle-contacts" class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 pb-2"></div>
+            </details>
+          </div>
+          <div class="px-8 border-t border-slate-100 mb-8">
+            <details class="group py-6">
+              <summary class="flex items-center justify-between cursor-pointer list-none font-black text-sm text-slate-700 uppercase tracking-wide">
+                <span>25년 연락기록 히스토리 (AD열 ~ AE열)</span><i class="fas fa-chevron-down text-slate-300 group-open:rotate-180 transition-transform"></i>
+              </summary>
+              <div id="toggle-logs" class="mt-4 grid grid-cols-1 gap-4 pb-2"></div>
+            </details>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const SECURITY_CODE = "1151";
+    const SPREADSHEET_ID = "1iTTL-bYSQp_DoAtXkgTuxZh6cg5lvJKEt4dcnwevkmU";
+    const SHEET_GID = "0";
+    // 사용자님께서 말씀하신 안정적인 export?format=csv 방식으로 변경
+    const CSV_URL = `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/export?format=csv&gid=${SHEET_GID}`;
+
+    let rawData = [];
+    let headers = [];
+    const COLUMN_C_TOOLTIP = `O: 참여 / △: 검토 / 희망: 25년희망 / XO: 내년검토 / X△: 종료 / -: 미컨택 / X: 관심없음 / 비고: 대규모`;
+
+    function handlePasscodeKeyUp(event) {
+      if (event.key === 'Enter') verifyPasscode();
+      if (event.target.value.length === 4) verifyPasscode();
+    }
+
+    function verifyPasscode() {
+      const input = document.getElementById('passcode-input');
+      const errorMsg = document.getElementById('security-error');
+      if (input.value === SECURITY_CODE) {
+        document.getElementById('security-screen').classList.add('hidden');
+        document.getElementById('main-content').classList.remove('hidden');
+        fetchCsvData(); 
+      } else {
+        errorMsg.classList.remove('hidden');
+        input.value = '';
+        input.focus();
+      }
+    }
+
+    async function fetchCsvData() {
+      const loader = document.getElementById('loading');
+      try {
+        const response = await fetch(`${CSV_URL}&t=${new Date().getTime()}`);
+        if (!response.ok) throw new Error(`Status: ${response.status}`);
+        const csvText = await response.text();
+        parseCsv(csvText);
+        loader.style.display = 'none';
+      } catch (err) {
+        console.error("Fetch Error:", err);
+        loader.innerHTML = `<div class='p-10 text-center bg-white rounded-[2rem] shadow-2xl max-w-sm mx-auto'><h2 class='text-xl font-black text-red-600 mb-2 uppercase tracking-tighter'>Data Fetch Failed</h2><p class='text-sm text-slate-500 mb-6 font-medium leading-relaxed'>스프레드시트 공유 권한 또는<br>게시 설정을 다시 확인해 주세요.</p><button onclick='location.reload()' class='w-full py-4 bg-slate-900 text-white rounded-2xl font-bold active:scale-95 transition-transform shadow-lg'>다시 시도</button></div>`;
+      }
+    }
+
+    function parseCsv(text) {
+      const rows = text.split(/\r?\n/).filter(row => row.trim() !== "").map(row => {
+        const result = [];
+        let current = "";
+        let inQuotes = false;
+        for (let i = 0; i < row.length; i++) {
+          const char = row[i];
+          if (char === '"' && row[i+1] === '"') { current += '"'; i++; }
+          else if (char === '"') inQuotes = !inQuotes;
+          else if (char === ',' && !inQuotes) { result.push(current.trim()); current = ""; }
+          else current += char;
+        }
+        result.push(current.trim());
+        return result;
+      });
+
+      if (rows.length < 2) return;
+      
+      // 2행(Index 1)을 헤더로 정의
+      headers = rows[1]; 
+      const dataRows = rows.slice(2);
+
+      rawData = dataRows.map((row, idx) => {
+        let obj = { id: idx };
+        headers.forEach((h, i) => { 
+          obj[h] = row[i] !== undefined ? row[i] : ""; 
+        });
+        return obj;
+      }).filter(item => item[headers[5]]); // F열(기업명)이 있는 데이터만 유효 처리
+
+      initSearchFilters();
+    }
+
+    function initSearchFilters() {
+      if (!headers.length) return;
+      const getUnique = (idx) => [...new Set(rawData.map(d => String(d[headers[idx]] || "").trim()))].filter(Boolean).sort();
+      getUnique(2).forEach(v => document.getElementById('filter-c').add(new Option(v, v)));
+      getUnique(4).forEach(v => document.getElementById('filter-e').add(new Option(v, v)));
+      getUnique(6).forEach(v => document.getElementById('filter-g').add(new Option(v, v)));
+    }
+
+    function getBadgeColor(text) {
+      if (!text) return null;
+      const colors = ['bg-emerald-50 text-emerald-600 border-emerald-100', 'bg-violet-50 text-violet-600 border-violet-100', 'bg-sky-50 text-sky-600 border-sky-100', 'bg-orange-50 text-orange-600 border-orange-100', 'bg-rose-50 text-rose-600 border-rose-100', 'bg-indigo-50 text-indigo-600 border-indigo-100'];
+      let hash = 0;
+      for (let i = 0; i < text.length; i++) hash = text.charCodeAt(i) + ((hash << 5) - hash);
+      return colors[Math.abs(hash) % colors.length];
+    }
+
+    function formatValue(value, headerName) {
+      if (value === undefined || value === null || value === "") return '-';
+      if (headerName && String(headerName).includes('율')) {
+        const num = parseFloat(value);
+        if (!isNaN(num)) return (num <= 1 && num > 0) ? (num * 100).toFixed(1) + '%' : num.toFixed(1) + '%';
+      }
+      return value;
+    }
+
+    function handleQuickSearch() {
+      const query = document.getElementById('main-search-input').value.toLowerCase();
+      const valC = document.getElementById('filter-c').value;
+      const valE = document.getElementById('filter-e').value;
+      const valG = document.getElementById('filter-g').value;
+      const resultsDiv = document.getElementById('quick-results'), emptyDiv = document.getElementById('search-empty');
+
+      if (!query && !valC && !valE && !valG) {
+        resultsDiv.classList.add('hidden'); emptyDiv.classList.add('hidden'); return;
+      }
+
+      const filtered = rawData.filter(item => {
+        const matchesQuery = !query || Object.values(item).some(v => String(v).toLowerCase().includes(query));
+        const matchesC = !valC || String(item[headers[2]] || "").trim() === valC;
+        const matchesE = !valE || String(item[headers[4]] || "").trim() === valE;
+        const matchesG = !valG || String(item[headers[6]] || "").trim() === valG;
+        return matchesQuery && matchesC && matchesE && matchesG;
+      }).slice(0, 48);
+
+      if (filtered.length > 0) {
+        resultsDiv.innerHTML = '';
+        filtered.forEach(item => {
+          const card = document.createElement('div');
+          card.className = "bg-white p-8 rounded-[2rem] shadow-xl border border-slate-100 hover:shadow-blue-200/40 hover:-translate-y-2 transition-all cursor-pointer text-left group relative animate-fadeIn";
+          card.onclick = () => showDetail(item);
+          const hasPart = (String(item[headers[2]] || "").trim() === "O");
+          const prio = String(item[headers[6]] || "").trim();
+          const ac = String(item[headers[28]] || "").trim();
+
+          card.innerHTML = `
+            <div class="flex justify-between items-start mb-6"><span class="px-3 py-1 rounded-full text-[10px] font-black bg-blue-50 text-blue-600 uppercase tracking-widest">${item[headers[0]] || '기업'}</span><i class="fas fa-chevron-right text-slate-200 group-hover:text-blue-500 transition-colors"></i></div>
+            <h4 class="text-xl font-black text-slate-900 mb-2 flex flex-wrap items-center gap-2">
+              ${item[headers[4]] ? `<span class="px-2 py-0.5 rounded text-[9px] font-black bg-purple-100 text-purple-700 border border-purple-200">${item[headers[4]]}</span>` : ''}
+              <span class="truncate">${item[headers[5]] || '명칭 없음'}</span>
+              ${(prio === 'Y' || prio === 'N') ? `<span class="px-2 py-0.5 rounded text-[9px] font-black ${prio === 'Y' ? 'bg-green-50 text-green-600' : 'bg-slate-100 text-slate-500'}">${prio}</span>` : ''}
+            </h4>
+            <div class="flex flex-wrap gap-2 mt-4">
+              ${ac ? `<span class="px-2 py-0.5 rounded text-[9px] font-black border ${getBadgeColor(ac)}">${ac}</span>` : ''}
+              ${hasPart ? `<span class="px-2 py-0.5 rounded text-[9px] font-black bg-rose-50 text-rose-600 border border-rose-100">25 참여</span>` : ''}
+            </div>
+            <div class="mt-6 p-4 bg-slate-50 rounded-2xl group-hover:bg-blue-50 transition-colors border border-transparent group-hover:border-blue-100">
+              <p class="text-[10px] text-slate-400 font-black uppercase tracking-widest mb-1">${headers[3] || '상태'}</p>
+              <p class="text-sm text-slate-700 font-bold line-clamp-1">${item[headers[3]] || '-'}</p>
+            </div>`;
+          resultsDiv.appendChild(card);
+        });
+        resultsDiv.classList.remove('hidden'); emptyDiv.classList.add('hidden');
+      } else { resultsDiv.classList.add('hidden'); emptyDiv.classList.remove('hidden'); }
+    }
+
+    function showDetail(item) {
+      if (!item) return;
+      const modal = document.getElementById('modal-overlay'), content = document.getElementById('modal-content');
+      const contactSection = document.getElementById('toggle-contacts'), logSection = document.getElementById('toggle-logs');
+      const specialSection = document.getElementById('modal-special-section'), specialContainer = document.getElementById('special-data-container');
+      const hasPart = (String(item[headers[2]] || "").trim() === "O");
+      const prio = String(item[headers[6]] || "").trim();
+      const ac = String(item[headers[28]] || "").trim();
+
+      document.getElementById('modal-title').innerHTML = `
+        ${item[headers[4]] ? `<span class="px-3 py-1 rounded-xl text-[11px] font-black bg-purple-100 text-purple-700 border border-purple-200">${item[headers[4]]}</span>` : ''}
+        <span>${item[headers[5]] || '기업 상세 정보'}</span>
+        ${(prio === 'Y' || prio === 'N') ? `<span class="px-3 py-1 rounded-xl text-[11px] font-black ${prio === 'Y' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-slate-100 text-slate-500'}">지원대상:${prio}</span>` : ''}
+        ${ac ? `<span class="px-3 py-1 rounded-xl text-[11px] font-black border ${getBadgeColor(ac)}">${ac}</span>` : ''}
+        ${hasPart ? `<span class="px-3 py-1 rounded-xl text-[11px] font-black bg-rose-50 text-rose-600 border border-rose-100 ml-2">25 참여</span>` : ''}`;
+      
+      document.getElementById('modal-subtitle').textContent = item[headers[3]] || '기록된 아카이브 신청의향 정보가 없습니다.';
+      
+      content.innerHTML = ''; contactSection.innerHTML = ''; logSection.innerHTML = ''; specialContainer.innerHTML = '';
+      
+      if (hasPart || item[headers[31]] || item[headers[32]]) {
+        specialSection.classList.remove('hidden');
+        [headers[31], headers[32]].forEach(key => {
+          if (!key || !item[key]) return;
+          specialContainer.innerHTML += `<div class="p-6 rounded-[2rem] border border-blue-100 bg-white shadow-sm ring-4 ring-blue-50/10"><label class="block text-[11px] font-black text-blue-400 mb-2 uppercase tracking-widest">${key}</label><div class="text-xl font-black text-slate-800">${formatValue(item[key], key)}</div></div>`;
+        });
+      } else specialSection.classList.add('hidden');
+
+      const renderItem = (h, idx) => {
+        if ([4, 5, 28, 31, 32].includes(idx)) return;
+        const isContact = idx >= 23 && idx <= 27, isLog = idx >= 29 && idx <= 30;
+        const div = document.createElement('div');
+        if (idx === 2) { // C열 툴팁
+          div.className = "p-6 rounded-[2rem] border border-blue-100 bg-blue-50/30 hover:bg-white transition-all relative group-tooltip cursor-help";
+          div.innerHTML = `<label class="flex items-center text-[10px] font-black text-blue-500 mb-2 uppercase tracking-widest">${h} <i class="fas fa-question-circle ml-2 opacity-30"></i></label><div class="text-lg font-black text-blue-900">${formatValue(item[h], h)}</div><div class="tooltip-content absolute z-50 left-0 bottom-full mb-4 w-72 p-6 bg-slate-900 text-white text-[12px] rounded-[2rem] shadow-2xl pointer-events-none leading-relaxed border border-slate-800">${COLUMN_C_TOOLTIP}<div class="absolute top-full left-10 -mt-1 border-4 border-transparent border-t-slate-900"></div></div>`;
+        } else {
+          div.className = "p-6 rounded-[2rem] border border-slate-100 bg-slate-50/50 hover:bg-white transition-all hover:shadow-lg hover:border-slate-200";
+          div.innerHTML = `<label class="block text-[11px] font-black text-slate-400 mb-2 uppercase tracking-widest">${h}</label><div class="text-lg font-bold text-slate-800">${formatValue(item[h], h)}</div>`;
+        }
+        if (isContact) contactSection.appendChild(div); else if (isLog) logSection.appendChild(div); else content.appendChild(div);
+      };
+      
+      headers.forEach((h, i) => { if (i >= 7 && i <= 11) renderItem(h, i); });
+      headers.forEach((h, i) => { if (!(i >= 7 && i <= 11)) renderItem(h, i); });
+      
+      modal.classList.remove('hidden'); 
+      document.getElementById('modal-content-container').scrollTop = 0; 
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() { document.getElementById('modal-overlay').classList.add('hidden'); document.body.style.overflow = 'auto'; }
+  </script>
+</body>
+</html>
