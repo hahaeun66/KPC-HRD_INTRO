@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KPC HRD아카이브 교육기획 시스템</title>
+    <title>KPC HRD아카이브 사전안내</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- React & Babel CDN -->
@@ -47,8 +47,186 @@
         .switch-dot { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         
         .brochure-card { perspective: 1000px; cursor: pointer; }
-        .brochure-inner { transition: transform 0.6s; transform-style: preserve-3d; }
+        .brochure-inner { 
+            transition: transform 0.6s; 
+            transform-style: preserve-3d;
+            background-color: #E51837;
+        }
         .brochure-card:hover .brochure-inner { transform: rotateY(-10deg) translateY(-10px); }
+
+        /* --- HRD 컴포넌트 전용 스타일 --- */
+
+/* 1. 폰트 로드 (이미 페이지에 Noto Sans가 있다면 생략 가능) */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap');
+
+/* 2. 전체 래퍼 (격리 공간) */
+.hrd-banner-wrapper {
+    font-family: 'Noto Sans KR', sans-serif; /* 이 구역만 고딕체 적용 */
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 600px; /* 너무 넓게 퍼지지 않도록 제한 */
+    margin: 40px 0;   /* 위아래 다른 콘텐츠와의 간격 */
+    text-align: left; /* 왼쪽 정렬 */
+    line-height: 1.3;
+    color: #333333;   /* 기본 텍스트 색상 */
+}
+
+/* 요소별 초기화 (기존 페이지 스타일 간섭 방지) */
+.hrd-banner-wrapper h1, 
+.hrd-banner-wrapper h2, 
+.hrd-banner-wrapper p {
+    margin: 0;
+    padding: 0;
+    border: none;
+    letter-spacing: -0.05em; /* 자간 좁게 */
+}
+
+/* 공통: 붉은색 포인트 */
+.hrd-banner-wrapper .hrd-red {
+    color: #E63548;
+}
+
+/* --- 상단 텍스트 ("**연 1.4만원...") --- */
+.hrd-banner-wrapper .hrd-top-text {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+/* kpc 로고 텍스트 */
+.hrd-banner-wrapper .hrd-kpc-logo {
+    color: #E63548;
+    /* kpc 로고 특유의 폰트 느낌이 필요하면 여기에 추가 */
+}
+
+/* 얇은 밑줄 장식 ("**연" 아래) */
+.hrd-banner-wrapper .hrd-deco-bottom {
+    position: relative;
+    display: inline-block;
+}
+
+
+/* --- 메인 타이틀 ("HRD 아카이브") --- */
+.hrd-banner-wrapper .hrd-main-title {
+    font-size: 64px; /* 글자 크기 */
+    font-weight: 900;
+    color: #E63548;
+    line-height: 1.1;
+    margin-top: 10px;
+}
+
+/* 모바일 대응: 화면이 좁을 때 글자 크기 줄임 */
+@media (max-width: 600px) {
+    .hrd-banner-wrapper .hrd-main-title {
+        font-size: 42px;
+    }
+}
+
+/* 두꺼운 윗줄 장식 ("HRD" 위) */
+.hrd-banner-wrapper .hrd-deco-top {
+    position: relative;
+    display: inline-block;
+}
+.hrd-banner-wrapper .hrd-deco-top::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: -4px; /* 글자 위 간격 */
+    width: 50%;
+    height: 4px; /* 선 두께 */
+    background-color: #E63548;
+}
+
+/* 두꺼운 밑줄 장식 ("이브" 아래) */
+.hrd-banner-wrapper .hrd-deco-bottom-thick {
+    position: relative;
+    display: inline-block;
+}
+
+/* --- 추가 섹션 스타일 --- */
+.hrd-sub-banner-wrapper {
+    text-align: center;
+    line-height: 1.2;
+    font-family: 'Noto Sans KR', sans-serif;
+}
+
+/* 2. 첫 번째 줄과 두 번째 줄 사이의 간격 직접 조절 */
+.hrd-line-1 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 5px; /* [수정] 15px -> 5px로 줄여서 아랫줄과 밀착 */
+}
+
+.hrd-line-2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 0;      /* [추가] 혹시 모를 위쪽 여백 제거 */
+    margin-bottom: 40px;
+}
+
+/* 텍스트 기본 스타일 */
+.hrd-sub-banner-wrapper .text-normal {
+    font-size: 22px;
+    font-weight: 700;
+    color: #000;
+}
+
+/* 넷플릭스 로고 스타일 */
+.logo-netflix {
+    font-size: 32px;
+    font-weight: 900;
+    color: #E50914; /* 넷플릭스 레드 */
+    letter-spacing: -1px;
+}
+
+/* 유튜브 로고 스타일 */
+.logo-youtube {
+    font-size: 28px;
+    font-weight: 700;
+    color: #282828;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.yt-icon {
+    background-color: #FF0000;
+    color: white;
+    border-radius: 6px;
+    padding: 0 8px;
+    font-size: 18px;
+}
+
+/* kpc 로고 강조 */
+.logo-kpc {
+    font-size: 30px;
+    font-weight: 900;
+    color: #E63548;
+    position: relative;
+}
+
+/* "무제한" 강조 색상 */
+.text-highlight {
+    font-size: 24px;
+    font-weight: 800;
+    color: #E63548;
+}
+
+/* 모바일 크기 조정 */
+@media (max-width: 600px) {
+    .hrd-sub-banner-wrapper .text-normal { font-size: 16px; }
+    .logo-netflix { font-size: 24px; }
+    .logo-youtube { font-size: 20px; }
+    .logo-kpc { font-size: 22px; }
+    .text-highlight { font-size: 18px; }
+}
+
     </style>
 </head>
 <body class="text-slate-900 leading-normal font-sans text-left">
@@ -242,9 +420,9 @@
 
                 const groupedStrict = [];
                 const shownTitles = new Set();
-                const catOrder = [];
-                strictMatches.forEach(item => { if (!catOrder.includes(item.summaryCategory)) catOrder.push(item.summaryCategory); });
-                catOrder.forEach(catName => {
+                const categoryOrder = [];
+                strictMatches.forEach(item => { if (!categoryOrder.includes(item.summaryCategory)) categoryOrder.push(item.summaryCategory); });
+                categoryOrder.forEach(catName => {
                     const items = strictMatches.filter(c => c.summaryCategory === catName);
                     groupedStrict.push({ category: catName, items });
                     items.forEach(i => shownTitles.add(i.title));
@@ -271,14 +449,14 @@
                         <div className="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden relative shadow-inner">
                             <div className="absolute top-0 left-0 h-full w-24 bg-[#E51837] rounded-full loading-bar-inner"></div>
                         </div>
-                        <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] italic">Data Synchronizing...</p>
+                        <p className="text-[11px] font-black text-slate-400 uppercase tracking-[0.4em] italic text-center">Data Synchronizing...</p>
                     </div>
                 </div>
             );
 
             return (
                 <div className="min-h-screen pb-12">
-                    <div className="max-w-4xl mx-auto md:my-8 bg-white md:rounded-[2rem] shadow-xl overflow-hidden border border-slate-200 flex flex-col animate-in">
+                    <div className="max-w-4xl mx-auto md:my-8 bg-white md:rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-200 flex flex-col animate-in">
                         
                         {/* Tab Navigation */}
                         <div className="flex border-b border-slate-100 bg-slate-50/80 sticky top-0 z-50 backdrop-blur-sm">
@@ -302,36 +480,66 @@
                             ))}
                         </div>
 
-                        {/* Intro Page */}
+                        {/* --- [업데이트] 사업 소개 (Intro) 페이지 --- */}
                         {activeTab === 'intro' && (
                             <div className="animate-in p-8 md:p-16 flex flex-col items-center text-center">
-                                <div className="mb-10 max-w-xl text-slate-900 text-center">
-                                    <h1 className="text-3xl md:text-4xl font-black tracking-tight mb-6 leading-tight">KPC HRD아카이브<br/><span className="text-blue-600 text-2xl md:text-3xl font-black">성장하는 기업의 필독서</span></h1>
-                                    <p className="text-slate-500 font-medium text-base mb-10 leading-relaxed text-balance italic">한국생산성본부의 노하우로 검증된 HRD아카이브 교육과정과 함께<br/>무제한 학습, 임직원 역량 상승, 훈련비 절감의 기회를 누리세요</p>
-                                </div>
-                                <div className="brochure-card w-full max-w-xs mb-12" onClick={() => window.open('https://ebook.kpc.or.kr/Viewer/2026hrdarchive_intro', '_blank')}>
-                                    <div className="brochure-inner bg-slate-900 rounded-[2rem] p-8 aspect-[3/4] shadow-2xl relative overflow-hidden flex flex-col justify-between border-4 border-slate-800 text-white text-left text-sm">
-                                        <div className="space-y-3">
-                                            <p className="text-blue-400 font-black tracking-widest text-[10px] uppercase italic text-left">Planning Guide</p>
-                                            <h2 className="text-2xl font-black leading-tight tracking-tight text-left">KPC 2026<br/>HRD아카이브</h2>
+<div className="hrd-banner-wrapper">
+    <p className="hrd-top-text">
+        <span className="hrd-deco-bottom">**연</span>{" "} 
+        <span className="hrd-red">1.4만원</span>으로 누리는{" "}
+        <span className="hrd-kpc-logo">kpc</span> 교육의 모든 것
+    </p>
+
+    <h1 className="hrd-main-title">
+        <span className="hrd-deco-top">HRD</span> 아카<span className="hrd-deco-bottom-thick">이브</span>
+    </h1>
+</div>
+{/* --- [추가된 섹션] Netflix/YouTube 스타일 --- */}
+<div className="hrd-sub-banner-wrapper">
+    <div className="hrd-line-1">
+        <span className="logo-netflix">NETFLIX</span>
+        <span className="text-normal"> 처럼 간단하고,</span>
+        <span className="logo-youtube">
+            <span className="yt-icon">▶</span> YouTube
+        </span>
+        <span className="text-normal"> 처럼 편리하게</span>
+    </div>
+    
+    <div className="hrd-line-2">
+        <span className="text-normal">국내 최고 교육훈련 전문기관 </span>
+        <span className="logo-kpc">kpc</span>
+        <span className="text-normal">의 정수를 </span>
+        <span className="text-highlight">무제한</span>
+        <span className="text-normal"> 제공해 드립니다.</span>
+    </div>
+</div>
+                                {/* 브로슈어 카드 */}
+                                <div className="brochure-card w-full max-w-xs mb-14" onClick={() => window.open('https://ebook.kpc.or.kr/Viewer/2026hrdarchive_intro', '_blank')}>
+                                    <div className="brochure-inner rounded-[2.5rem] p-10 aspect-[3/4] shadow-2xl relative overflow-hidden flex flex-col justify-between border-4 border-white/20 text-white text-left shadow-[0_30px_60px_-12px_rgba(229,24,55,0.4)]">
+                                        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-3xl rounded-full translate-x-10 -translate-y-10"></div>
+                                        
+                                        <div className="space-y-4">
+                                            <div className="w-12 h-1 bg-white/40 rounded-full"></div>
+                                            <h2 className="text-3xl font-black leading-tight tracking-tight text-white">KPC 2026<br/>HRD아카이브</h2>
                                         </div>
                                         <div className="space-y-6">
-                                            <p className="text-slate-400 text-[11px] md:text-xs italic border-l-2 border-slate-700 pl-4 leading-relaxed text-left font-medium">
+                                            <p className="text-white text-[12px] md:text-sm italic border-l-2 border-white/30 pl-4 leading-relaxed font-bold">
                                                 성과를 이끄는 역량 모델링과<br/>
                                                 200여 개의 엄선된 교육과정
                                             </p>
                                             <div className="flex items-center gap-3">
-                                                <div className="p-2.5 bg-white/10 rounded-xl backdrop-blur-md"><SvgIcon name="bookOpen" size={20} /></div>
-                                                <span className="font-black text-xs uppercase animate-pulse">열람하기</span>
+                                                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-sm"><SvgIcon name="bookOpen" size={24} className="text-white" /></div>
+                                                <span className="font-black text-sm uppercase animate-pulse text-white">브로슈어 열람하기</span>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+
                                 <div className="flex flex-col md:flex-row items-center gap-4">
-                                    <button onClick={() => setActiveTab('search')} className="px-8 py-4 bg-slate-900 text-white rounded-[1.5rem] font-black text-lg hover:bg-slate-800 transition-all active:scale-95 shadow-lg flex items-center gap-3 transition-all font-sans">
+                                    <button onClick={() => setActiveTab('search')} className="px-10 py-5 bg-slate-900 text-white rounded-[2rem] font-black text-xl hover:bg-slate-800 active:scale-95 shadow-lg flex items-center gap-3 transition-all font-sans">
                                         교육과정 찾기 <SvgIcon name="chevronRight" size={20} />
                                     </button>
-                                    <a href="https://onkpc.or.kr/e-kpc/front/course/group_apply_archive.jsp?pInquiryType=01" target="_blank" rel="noopener noreferrer" className="px-8 py-4 bg-blue-600 text-white rounded-[1.5rem] font-black text-lg hover:bg-blue-700 transition-all active:scale-95 shadow-xl flex items-center gap-3 transition-all font-sans">
+                                    <a href="https://onkpc.or.kr/e-kpc/front/course/group_apply_archive.jsp?pInquiryType=01" target="_blank" rel="noopener noreferrer" className="px-10 py-5 bg-[#E51837] text-white rounded-[2rem] font-black text-xl hover:bg-[#c41530] active:scale-95 shadow-xl flex items-center gap-3 transition-all font-sans text-center">
                                         교육 신청하기 <SvgIcon name="externalLink" size={20} />
                                     </a>
                                 </div>
@@ -349,18 +557,14 @@
                                                 <button onClick={toggleAll} className={`w-10 h-5 rounded-full relative transition-all ${isAllSelected ? 'bg-blue-600' : 'bg-slate-200'}`}><div className={`switch-dot absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${isAllSelected ? 'left-5.5' : 'left-0.5'}`}></div></button>
                                             </div>
                                         </div>
-                                        <div className="relative text-slate-900">
+                                        <div className="relative text-slate-900 text-left">
                                             <input type="text" placeholder="검색어를 입력하세요 (공백 무시 검색 가능)" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSearch()} className="w-full pl-12 pr-14 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-blue-500 focus:bg-white text-base font-bold transition-all shadow-sm" />
                                             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"><SvgIcon name="search" size={20} /></div>
-                                            <button onClick={handleSearch} className="absolute right-1.5 top-1/2 -translate-y-1/2 w-11 h-11 bg-slate-900 text-white rounded-xl flex items-center justify-center hover:bg-blue-600 active:scale-90 transition-all shadow-md"><SvgIcon name="search" size={18} /></button>
+                                            <button onClick={handleSearch} className="absolute right-1.5 top-1/2 -translate-y-1/2 w-11 h-11 bg-slate-900 text-white rounded-xl flex items-center justify-center hover:bg-blue-600 active:scale-90 transition-all shadow-md font-sans"><SvgIcon name="search" size={18} /></button>
                                         </div>
                                     </div>
                                     <div className="grid grid-cols-1 gap-4 bg-slate-50/50 p-6 rounded-3xl border border-slate-100">
-                                        {[
-                                            {label: '공통역량', color: 'emerald', list: COMMON_COMPETENCY},
-                                            {label: '리더십', color: 'blue', list: LEADERSHIP_COMPETENCY},
-                                            {label: '직무역량', color: 'red', list: JOB_COMPETENCY}
-                                        ].map(group => (
+                                        {[ {label: '공통역량', color: 'emerald', list: COMMON_COMPETENCY}, {label: '리더십', color: 'blue', list: LEADERSHIP_COMPETENCY}, {label: '직무역량', color: 'red', list: JOB_COMPETENCY} ].map(group => (
                                             <div key={group.label} className="text-left">
                                                 <h5 className={`text-[10px] font-black text-${group.color === 'red' ? '[#E51837]' : group.color + '-600'} mb-2 uppercase flex items-center gap-1.5`}><div className={`w-1 h-3 bg-${group.color === 'red' ? '[#E51837]' : group.color + '-500'} rounded-full`}></div> {group.label}</h5>
                                                 <div className="flex flex-wrap gap-1.5 text-left">{group.list.map(cat => (<button key={cat} onClick={() => toggleCategory(cat)} className={`px-2.5 py-1.5 rounded-lg border font-bold text-[10px] transition-all ${selectedCategories.includes(cat) ? getCategoryActiveStyle(cat) : 'bg-white border-slate-100 text-slate-400'}`}>{cat}</button>))}</div>
@@ -377,13 +581,13 @@
                                                 {group.category} <span className="ml-1 text-slate-400 font-bold">({group.items.length})</span>
                                             </div>
                                             {group.items.map((course, idx) => (
-                                                <div key={idx} className="p-5 md:p-6 flex items-center justify-between gap-4 hover:bg-blue-50/10 transition-colors border-b last:border-0 border-slate-50 text-slate-800">
-                                                    <div onClick={() => setSelectedCourseDetail(course)} className="flex-1 flex flex-col md:flex-row md:items-center gap-4 cursor-pointer text-left">
-                                                        <div className="flex-1 text-left font-sans">
-                                                            <div className="flex items-center gap-2 mb-1 text-left">
+                                                <div key={idx} className="p-5 md:p-6 flex items-center justify-between gap-4 hover:bg-blue-50/10 transition-colors border-b last:border-0 border-slate-50 text-slate-800 text-left font-sans">
+                                                    <div onClick={() => setSelectedCourseDetail(course)} className="flex-1 flex flex-col md:flex-row md:items-center gap-4 cursor-pointer text-left font-sans font-medium">
+                                                        <div className="flex-1 text-left font-sans font-medium text-slate-800 leading-relaxed">
+                                                            <div className="flex items-center gap-2 mb-1 text-left font-sans">
                                                                 <span className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase ${getCategoryStyle(course.summaryCategory)}`}>{course.summaryCategory}</span>
                                                                 <h3 className="text-[15px] font-bold break-keep leading-snug group-hover:text-blue-600 font-sans">{course.title}</h3>
-                                                                <span className="text-[10px] text-blue-600 font-black bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100 font-sans tracking-tighter">{course.hours}H</span>
+                                                                <span className="text-[10px] text-blue-600 font-black bg-blue-50 px-1.5 py-0.5 rounded border border-blue-100 font-sans tracking-tighter">{(course.hours).toFixed(1)}H</span>
                                                             </div>
                                                             <p className="text-slate-400 text-[11px] line-clamp-1 italic">{course.summaryIntro}</p>
                                                         </div>
@@ -401,9 +605,9 @@
 
                         {activeTab === 'cart' && (
                             <div className="animate-in min-h-[700px]">
-                                <div className="px-6 py-4 bg-blue-50/50 border-b border-blue-100 text-left text-slate-700">
-                                    <div className="max-w-3xl mx-auto flex items-start gap-3 text-left">
-                                        <div className="shrink-0 p-2 bg-blue-600 rounded-lg text-white mt-1 shadow-sm"><SvgIcon name="info" size={16} /></div>
+                                <div className="px-6 py-4 bg-blue-50/50 border-b border-blue-100 text-left text-slate-700 font-sans font-medium">
+                                    <div className="max-w-3xl mx-auto flex items-start gap-3 text-left font-sans">
+                                        <div className="shrink-0 p-2 bg-blue-600 rounded-lg text-white mt-1 shadow-sm font-sans"><SvgIcon name="info" size={16} /></div>
                                         <div className="space-y-0.5 text-left font-sans">
                                             <h4 className="text-[14px] font-black text-blue-900 tracking-tight leading-snug">교육과정을 검색 및 추가하여 우리 기업에 맞는 교육과정 15시간을 기획해보세요.</h4>
                                             <p className="text-[12px] font-bold text-blue-700/70">15시간 달성시 아카이브 수료증과 과정별 수료증 발급이 가능합니다.</p>
@@ -412,33 +616,33 @@
                                 </div>
                                 <div className={`p-6 border-b transition-all duration-500 ${isCompleted ? 'bg-[#E51837]' : 'bg-slate-900'}`}>
                                     <div className="max-w-3xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-white text-left font-sans">
-                                        <div className="flex-1 w-full space-y-2 text-left">
-                                            <div className="flex items-baseline gap-2 font-sans font-black"><span className="text-4xl">{totalCartHours.toFixed(1)}</span><span className="text-sm opacity-50 font-bold uppercase tracking-widest">/ 15.0 Hours Planned</span></div>
+                                        <div className="flex-1 w-full space-y-2 text-left font-sans text-white">
+                                            <div className="flex items-baseline gap-2 font-sans font-black text-white"><span className="text-4xl text-white">{totalCartHours.toFixed(1)}</span><span className="text-sm opacity-50 font-bold uppercase tracking-widest font-sans">/ 15.0 Hours Planned</span></div>
                                             <div className="w-full h-1.5 bg-white/20 rounded-full overflow-hidden shadow-inner"><div className="h-full bg-white transition-all duration-700 ease-out shadow-lg" style={{ width: `${hourProgress}%` }}></div></div>
                                         </div>
-                                        <div className="text-center md:text-right shrink-0">
+                                        <div className="text-center md:text-right shrink-0 font-sans font-bold">
                                             {isCompleted ? (
-                                                <div className="animate-in zoom-in bg-white/10 px-6 py-2 rounded-2xl border border-white/20 text-center"><p className="text-sm font-black uppercase tracking-tight">최적 교육 구성 완료!</p><p className="text-[10px] opacity-70 font-bold font-sans">15시간 교육 기획안이 완성되었습니다.</p></div>
+                                                <div className="animate-in zoom-in bg-white/10 px-6 py-2 rounded-2xl border border-white/20 text-center text-white"><p className="text-sm font-black uppercase tracking-tight text-white">최적 교육 구성 완료!</p><p className="text-[10px] opacity-70 font-bold font-sans">15시간 교육 기획안이 완성되었습니다.</p></div>
                                             ) : (
-                                                <div className="bg-white/5 px-6 py-2 rounded-2xl text-center"><p className="text-sm font-black text-blue-300 font-sans">{(targetHours - totalCartHours).toFixed(1)}시간 필요</p><p className="text-[10px] opacity-50 font-bold font-sans">목표 시간까지 과정을 더 담아보세요.</p></div>
+                                                <div className="bg-white/5 px-6 py-2 rounded-2xl text-center text-white"><p className="text-sm font-black text-blue-300 font-sans">{(targetHours - totalCartHours).toFixed(1)}시간 필요</p><p className="text-[10px] opacity-50 font-bold font-sans">목표 시간까지 과정을 더 담아보세요.</p></div>
                                             )}
                                         </div>
                                     </div>
                                 </div>
-                                <div className="p-6 md:p-10 max-w-3xl mx-auto font-sans">
-                                    <div className="flex justify-between items-center mb-6 px-1 text-slate-400 font-black text-[11px] uppercase tracking-widest font-sans">
-                                        <p className="italic">Planning Inventory ({cart.length})</p>
-                                        {cart.length > 0 && <button onClick={clearCart} className="hover:text-[#E51837] flex items-center gap-1 transition-colors uppercase"><SvgIcon name="trash" size={12}/> Clear List</button>}
+                                <div className="p-6 md:p-10 max-w-3xl mx-auto font-sans font-medium">
+                                    <div className="flex justify-between items-center mb-6 px-1 text-slate-400 font-black text-[11px] uppercase tracking-widest font-sans font-black">
+                                        <p className="italic font-black">Planning Inventory ({cart.length})</p>
+                                        {cart.length > 0 && <button onClick={clearCart} className="hover:text-[#E51837] flex items-center gap-1 transition-colors uppercase font-sans font-black font-black"><SvgIcon name="trash" size={12}/> Clear List</button>}
                                     </div>
                                     <div className="space-y-3 text-left">
                                         {cart.map((course, idx) => (
                                             <div key={idx} className="group bg-white border border-slate-100 p-4 md:p-5 rounded-2xl flex items-center justify-between gap-4 hover:border-blue-200 transition-all shadow-sm font-sans text-slate-800">
                                                 <div className="flex-1 flex items-center gap-4 cursor-pointer text-left font-sans" onClick={() => setSelectedCourseDetail(course)}>
-                                                    <div className="w-8 h-8 bg-slate-50 text-slate-300 font-black rounded-lg flex items-center justify-center shrink-0 text-[10px] font-sans">{idx + 1}</div>
+                                                    <div className="w-8 h-8 bg-slate-50 text-slate-300 font-black rounded-lg flex items-center justify-center shrink-0 text-[10px] font-sans">{(idx + 1)}</div>
                                                     <div className="flex-1">
-                                                        <h4 className="text-[14px] font-bold break-keep">{course.title}</h4>
+                                                        <h4 className="text-[14px] font-bold break-keep text-slate-800">{course.title}</h4>
                                                         <div className="flex items-center gap-2 mt-0.5 text-[10px] text-slate-400 font-bold uppercase text-left tracking-tighter font-sans">
-                                                            <span className="text-blue-600 font-black">{course.hours}H</span><span className="opacity-30 font-sans">•</span><span>{course.summaryCategory}</span>
+                                                            <span className="text-blue-600 font-black">{(course.hours).toFixed(1)}H</span><span className="opacity-30 font-sans">•</span><span>{course.summaryCategory}</span>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -447,7 +651,7 @@
                                         ))}
                                         {cart.length === 0 && (
                                             <div className="py-20 bg-slate-50/50 rounded-3xl border-2 border-dashed border-slate-100 flex flex-col items-center gap-3 text-center">
-                                                <SvgIcon name="layout" size={32} className="text-slate-200 opacity-50" />
+                                                <SvgIcon name="layout" size={32} className="text-slate-200 opacity-50 font-sans" />
                                                 <p className="text-slate-400 font-bold text-sm">기획 리스트가 비어 있습니다.</p>
                                                 <button onClick={() => setActiveTab('search')} className="mt-2 px-6 py-2.5 bg-blue-600 text-white rounded-xl font-black text-xs shadow-md active:scale-95 transition-all">과정 추가하기</button>
                                             </div>
@@ -458,24 +662,20 @@
                         )}
 
                         {activeTab === 'calculator' && (
-                            <div className="animate-in p-8 md:p-16 flex flex-col items-center text-center text-slate-900">
-                                <div className="mb-10"><h2 className="text-2xl font-black tracking-tight mb-3 font-sans">교육비 견적 계산</h2><p className="text-slate-500 text-sm font-medium italic text-balance leading-relaxed font-sans">기업 규모와 인원수를 기반으로 예상 비용을 산출합니다.</p></div>
+                            <div className="animate-in p-8 md:p-16 flex flex-col items-center text-center text-slate-900 font-sans font-medium">
+                                <div className="mb-10 text-center font-sans font-black"><h2 className="text-2xl font-black tracking-tight mb-3 font-sans font-black">교육비 견적 계산</h2><p className="text-slate-500 text-sm font-medium italic text-balance leading-relaxed font-sans font-medium">기업 규모와 인원수를 기반으로 예상 비용을 산출합니다.</p></div>
                                 <div className="w-full max-w-md space-y-8 text-left text-slate-600 font-sans">
-                                    <div className="space-y-3">
-                                        <div className="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase tracking-widest text-left font-sans font-black">
+                                    <div className="space-y-3 font-sans font-medium">
+                                        <div className="flex justify-between items-center text-[10px] font-black text-slate-400 uppercase tracking-widest text-left font-sans">
                                             <p className="flex items-center gap-1.5"><SvgIcon name="building" size={12}/> Enterprise Type</p>
                                             <a href="https://ebook.kpc.or.kr/Viewer/2026hrdarchive_check" target="_blank" className="text-blue-500 hover:underline flex items-center gap-1 font-sans">우선지원기업 확인하기 <SvgIcon name="externalLink" size={10}/></a>
                                         </div>
-                                        <div className="grid grid-cols-2 gap-3 text-center font-sans">
-                                            {['preferred', 'large'].map(type => (
-                                                <button key={type} onClick={() => setCalcEnterpriseType(type)} className={`py-4 rounded-2xl border-2 transition-all font-black text-xs ${calcEnterpriseType === type ? 'bg-blue-600 border-blue-600 text-white shadow-lg' : 'bg-white border-slate-100 text-slate-400 hover:border-blue-100 font-sans'}`}>
-                                                    {type === 'preferred' ? '우선지원대상' : '대규모 기업'}<br/><span className="opacity-60 font-sans mt-1 block tracking-tight">{(type === 'preferred' ? 14000 : 28000).toLocaleString()}원</span>
-                                                </button>
-                                            ))}
+                                        <div className="grid grid-cols-2 gap-3 font-sans text-center">
+                                            {['preferred', 'large'].map(type => (<button key={type} onClick={() => setCalcEnterpriseType(type)} className={`py-4 rounded-2xl border-2 transition-all font-black text-xs font-sans ${calcEnterpriseType === type ? 'bg-[#E51837] text-white border-[#E51837] shadow-lg shadow-red-100' : 'bg-white border-slate-100 text-slate-400 hover:border-slate-200 font-sans font-medium'}`}>{type === 'preferred' ? '우선지원대상' : '대규모 기업'}<br/><span className="opacity-60 font-sans mt-1 block tracking-tight">{(type === 'preferred' ? 14000 : 28000).toLocaleString()}원</span></button>))}
                                         </div>
                                     </div>
-                                    <div className="space-y-3 font-sans text-sm"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5 font-sans"><SvgIcon name="users" size={12}/> Participants</p><div className="relative text-left font-sans"><input type="number" min="1" value={calcParticipants} onChange={(e) => setCalcParticipants(Math.max(1, parseInt(e.target.value) || 0))} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-blue-500 focus:bg-white text-xl font-black text-center pr-12 shadow-inner text-slate-800 transition-all font-sans" /><span className="absolute right-6 top-1/2 -translate-y-1/2 font-black text-slate-300 text-sm uppercase font-sans">명</span></div></div>
-                                    <div className="bg-slate-900 rounded-[1.5rem] p-8 text-white shadow-xl relative overflow-hidden text-left font-sans"><div className="relative z-10 flex flex-col gap-1 text-left font-sans"><p className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] mb-2 font-sans font-black">Estimate Total</p><h3 className="text-4xl font-black tracking-tighter font-sans text-left">{(calcParticipants * (calcEnterpriseType === 'preferred' ? 14000 : 28000)).toLocaleString()}<span className="text-xl ml-1 font-bold font-sans">원</span></h3><p className="text-[9px] text-white/30 font-bold uppercase mt-3 tracking-widest border-t border-white/5 pt-3 font-sans">Includes VAT • Estimated in real-time</p></div></div>
+                                    <div className="space-y-3 text-left font-sans text-sm"><p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5 font-sans text-left font-black"><SvgIcon name="users" size={12}/> Participants</p><div className="relative text-left font-sans"><input type="number" min="1" value={calcParticipants} onChange={(e) => setCalcParticipants(Math.max(1, parseInt(e.target.value) || 0))} className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-blue-500 focus:bg-white text-xl font-black text-center pr-12 shadow-inner text-slate-800 transition-all font-sans font-black" /><span className="absolute right-6 top-1/2 -translate-y-1/2 font-black text-slate-300 text-sm uppercase font-sans">명</span></div></div>
+                                    <div className="bg-slate-900 rounded-[1.5rem] p-8 text-white shadow-xl relative overflow-hidden text-left font-sans font-black"><div className="relative z-10 flex flex-col gap-1 text-left font-sans"><p className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em] mb-2 font-sans font-black">Estimate Total</p><h3 className="text-4xl font-black tracking-tighter font-sans text-left text-white">{(calcParticipants * (calcEnterpriseType === 'preferred' ? 14000 : 28000)).toLocaleString()}<span className="text-xl ml-1 font-bold font-sans">원</span></h3><p className="text-[9px] text-white/30 font-bold uppercase mt-3 tracking-widest border-t border-white/5 pt-3 font-sans">Includes VAT • Estimated in real-time</p></div></div>
                                 </div>
                             </div>
                         )}
@@ -484,58 +684,17 @@
                     {/* 상세보기 모달 */}
                     {selectedCourseDetail && (
                         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 animate-in">
-                            <div className="absolute inset-0 bg-slate-900/90 backdrop-blur-md" onClick={() => setSelectedCourseDetail(null)}></div>
-                            <div className="relative bg-white w-full max-w-4xl max-h-[90vh] rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col border border-white/10 text-slate-800 text-left text-sm">
-                                <div className="p-6 md:p-8 bg-slate-900 text-white text-left">
-                                    <div className="flex justify-between items-start gap-4 text-left">
-                                        <div className="flex-1 space-y-4 text-left font-sans">
-                                            <div className="flex flex-wrap items-center gap-2 font-sans text-[10px] font-black uppercase">
-                                                <span className="px-2 py-0.5 bg-blue-600 rounded shadow-md">Detail View</span>
-                                                <span className={`px-2 py-0.5 rounded border ${getCategoryStyle(selectedCourseDetail.category)} border-white/10`}>{selectedCourseDetail.category}</span>
-                                                {selectedCourseDetail.hours > 0 && <span className="px-2 py-0.5 bg-amber-500 rounded border border-white/10 shadow-md font-sans">{selectedCourseDetail.hours}H</span>}
-                                            </div>
-                                            <div className="flex flex-col md:flex-row md:items-center gap-4 text-left font-sans">
-                                                <h2 className="text-xl md:text-2xl font-black break-keep flex-1 leading-tight text-left">{selectedCourseDetail.title}</h2>
-                                                <button onClick={() => {addToCart(selectedCourseDetail); setSelectedCourseDetail(null);}} disabled={cart.find(c => c.title === selectedCourseDetail.title)} className={`shrink-0 flex items-center gap-1.5 px-5 py-2.5 rounded-xl font-black text-xs transition-all active:scale-95 shadow-lg ${cart.find(c => c.title === selectedCourseDetail.title) ? 'bg-white/10 text-slate-400 border border-white/5 cursor-not-allowed font-sans' : 'bg-blue-600 text-white hover:bg-blue-500 font-sans font-black uppercase'}`}>
-                                                    <SvgIcon name={cart.find(c => c.title === selectedCourseDetail.title) ? 'check' : 'layout'} size={14}/> {cart.find(c => c.title === selectedCourseDetail.title) ? 'ADDED' : 'PLANNING'}
-                                                </button>
-                                            </div>
-                                        </div>
-                                        <button onClick={() => setSelectedCourseDetail(null)} className="p-2 hover:bg-white/10 rounded-lg transition-colors text-slate-400 hover:text-white shrink-0 font-sans"><SvgIcon name="x" size={24} /></button>
-                                    </div>
-                                </div>
+                            <div className="absolute inset-0 bg-slate-900/90 backdrop-blur-md font-sans" onClick={() => setSelectedCourseDetail(null)}></div>
+                            <div className="relative bg-white w-full max-w-4xl max-h-[90vh] rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col border border-white/10 text-slate-800 text-left text-sm font-sans font-medium">
+                                <div className="p-6 md:p-8 bg-slate-900 text-white text-left font-sans"><div className="flex justify-between items-start gap-4 text-left font-sans font-medium"><div className="flex-1 space-y-4 text-left font-sans"><div className="flex flex-wrap items-center gap-2 font-sans text-[10px] font-black uppercase"><span className="px-2 py-0.5 bg-blue-600 rounded shadow-md">Detail Page</span><span className={`px-2 py-0.5 rounded border ${getCategoryStyle(selectedCourseDetail.category)} border-white/10`}>{selectedCourseDetail.category}</span>{selectedCourseDetail.hours > 0 && <span className="px-2 py-0.5 bg-amber-500 rounded border border-white/10 shadow-md font-sans font-black">{(selectedCourseDetail.hours).toFixed(1)}H</span>}</div><div className="flex flex-col md:flex-row md:items-center gap-4 text-left font-sans font-black leading-tight text-white"><h2 className="text-xl md:text-2xl font-black break-keep flex-1 leading-tight text-left text-white">{selectedCourseDetail.title}</h2><button onClick={() => {addToCart(selectedCourseDetail); setSelectedCourseDetail(null);}} disabled={cart.find(c => c.title === selectedCourseDetail.title)} className={`shrink-0 flex items-center gap-1.5 px-5 py-2.5 rounded-xl font-black text-xs transition-all active:scale-95 shadow-lg ${cart.find(c => c.title === selectedCourseDetail.title) ? 'bg-white/10 text-slate-400 border border-white/5 cursor-not-allowed font-sans' : 'bg-blue-600 text-white hover:bg-blue-500 font-sans font-black uppercase font-black'}`}><SvgIcon name={cart.find(c => c.title === selectedCourseDetail.title) ? 'check' : 'layout'} size={14}/> {cart.find(c => c.title === selectedCourseDetail.title) ? 'ADDED' : 'PLANNING'}</button></div></div><button onClick={() => setSelectedCourseDetail(null)} className="p-2 hover:bg-white/10 rounded-lg transition-colors text-slate-400 hover:text-white shrink-0 font-sans"><SvgIcon name="x" size={24} /></button></div></div>
                                 <div className="flex-1 overflow-y-auto p-6 md:p-10 scrollbar-hide bg-white text-slate-600 text-left font-sans">
-                                    <div className="space-y-10 font-sans text-left text-slate-700 leading-relaxed">
-                                        <div className="flex flex-col lg:flex-row gap-8 items-start text-left font-sans">
-                                            <div className="flex-1 text-left font-sans">
-                                                <div className="flex items-center gap-1.5 mb-4 text-blue-600 font-black text-[10px] uppercase tracking-widest text-left font-sans"><div className="w-1 h-3 bg-blue-600 rounded-full font-sans"></div> Course Summary</div>
-                                                <p className="text-[14px] md:text-[15px] leading-relaxed whitespace-pre-line border-l-2 border-slate-100 pl-5 break-keep font-medium italic text-left font-sans tracking-tight">{selectedCourseDetail.intro}</p>
-                                            </div>
-                                            {selectedCourseDetail.thumbnail && (
-                                                <div className="w-full lg:w-72 shrink-0 animate-in text-center font-sans">
-                                                    <div className="aspect-video rounded-2xl overflow-hidden shadow-lg border border-slate-100 font-sans"><img src={selectedCourseDetail.thumbnail} className="w-full h-full object-cover font-sans" alt={selectedCourseDetail.title} /></div>
-                                                </div>
-                                            )}
-                                        </div>
-                                        <section className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left font-sans">
-                                            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm text-left font-sans">
-                                                <div className="w-8 h-8 bg-white rounded-lg shadow-sm flex items-center justify-center text-blue-600 mb-4 font-sans"><SvgIcon name="users" size={16} /></div>
-                                                <h4 className="text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest font-sans text-left">학습 대상</h4>
-                                                <p className="text-[13px] md:text-[14px] font-bold text-slate-700 leading-relaxed whitespace-pre-line font-sans text-left tracking-tight">{selectedCourseDetail.target}</p>
-                                            </div>
-                                            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm text-left font-sans">
-                                                <div className="w-8 h-8 bg-white rounded-lg shadow-sm flex items-center justify-center text-indigo-600 mb-4 font-sans"><SvgIcon name="target" size={16} /></div>
-                                                <h4 className="text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest font-sans text-left">학습 목표</h4>
-                                                <p className="text-[13px] md:text-[14px] font-bold text-slate-700 leading-relaxed whitespace-pre-line font-sans text-left tracking-tight">{selectedCourseDetail.goal}</p>
-                                            </div>
-                                        </section>
-                                        <section className="bg-slate-900 rounded-3xl p-8 md:p-10 text-white shadow-xl text-left border border-white/5 font-sans">
-                                            <div className="flex items-center gap-2.5 mb-6 text-left font-sans font-bold"><div className="p-2 bg-blue-600 rounded-lg font-sans"><SvgIcon name="list" size={16} /></div><h4 className="text-base font-black tracking-tight uppercase font-sans text-left text-white">Curriculum</h4></div>
-                                            <div className="text-sm text-slate-300 font-medium leading-relaxed whitespace-pre-line bg-white/5 p-6 rounded-2xl border border-white/5 break-keep font-sans text-left">{selectedCourseDetail.content}</div>
-                                        </section>
+                                    <div className="space-y-10 font-sans text-left text-slate-700 leading-relaxed font-sans font-medium">
+                                        <div className="flex flex-col lg:flex-row gap-8 items-start text-left font-sans font-medium text-slate-700 leading-relaxed"><div className="flex-1 text-left font-sans font-medium text-slate-700 leading-relaxed"><div className="flex items-center gap-1.5 mb-4 text-blue-600 font-black text-[10px] uppercase tracking-widest text-left font-sans"><div className="w-1 h-3 bg-blue-600 rounded-full font-sans"></div> Course Summary</div><p className="text-[14px] md:text-[15px] border-l-2 border-slate-100 pl-5 break-keep font-bold italic text-left font-sans tracking-tight leading-relaxed">{selectedCourseDetail.intro}</p></div>{selectedCourseDetail.thumbnail && (<div className="w-full lg:w-72 shrink-0 animate-in text-center font-sans"><div className="aspect-video rounded-2xl overflow-hidden shadow-lg border border-slate-100 font-sans"><img src={selectedCourseDetail.thumbnail} className="w-full h-full object-cover font-sans" alt={selectedCourseDetail.title} /></div></div>)}</div>
+                                        <section className="grid grid-cols-1 md:grid-cols-2 gap-4 text-left font-sans font-black"><div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm text-left font-sans font-black"><div className="w-8 h-8 bg-white rounded-lg shadow-sm flex items-center justify-center text-blue-600 mb-4 font-sans font-black font-sans"><SvgIcon name="users" size={16} /></div><h4 className="text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest font-sans text-left font-black">학습 대상</h4><p className="text-[13px] md:text-[14px] font-bold text-slate-800 leading-relaxed whitespace-pre-line font-sans text-left tracking-tight font-black">{selectedCourseDetail.target}</p></div><div className="p-6 bg-slate-50 rounded-2xl border border-slate-100 shadow-sm text-left font-sans font-black font-sans font-black"><div className="w-8 h-8 bg-white rounded-lg shadow-sm flex items-center justify-center text-indigo-600 mb-4 font-sans font-black"><SvgIcon name="target" size={16} /></div><h4 className="text-[10px] font-black text-slate-400 uppercase mb-2 tracking-widest font-sans text-left font-black font-black text-slate-400">학습 목표</h4><p className="text-[13px] md:text-[14px] font-bold text-slate-800 leading-relaxed whitespace-pre-line font-sans text-left tracking-tight font-black">{selectedCourseDetail.goal}</p></div></section>
+                                        <section className="bg-slate-900 rounded-3xl p-8 md:p-10 text-white shadow-xl text-left border border-white/5 font-sans font-black uppercase"><div className="flex items-center gap-2.5 mb-6 text-left font-sans font-bold"><div className="p-2 bg-blue-600 rounded-lg font-sans font-black font-black uppercase tracking-widest"><SvgIcon name="list" size={16} /></div><h4 className="text-base font-black tracking-tight uppercase font-sans text-left text-white font-black">Curriculum</h4></div><div className="text-sm text-slate-300 font-medium leading-relaxed whitespace-pre-line bg-white/5 p-6 rounded-2xl border border-white/5 break-keep font-sans text-left font-sans font-bold font-black">{selectedCourseDetail.content}</div></section>
                                     </div>
                                 </div>
-                                <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-center font-sans font-bold text-slate-900"><button onClick={() => setSelectedCourseDetail(null)} className="px-10 py-3 bg-slate-900 text-white rounded-xl font-black text-sm active:scale-95 transition-all font-sans uppercase shadow-md tracking-tight">Close View</button></div>
+                                <div className="p-4 border-t border-slate-100 bg-slate-50 flex justify-center font-sans font-bold text-slate-900 font-black"><button onClick={() => setSelectedCourseDetail(null)} className="px-10 py-3 bg-slate-900 text-white rounded-xl font-black text-sm active:scale-95 transition-all font-sans uppercase shadow-md font-black tracking-tight font-sans font-black font-black font-black">Close View</button></div>
                             </div>
                         </div>
                     )}
