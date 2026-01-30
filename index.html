@@ -454,9 +454,33 @@
             );
 
             return (
-                <div className="min-h-screen pb-12">
-                    <div className="max-w-4xl mx-auto md:my-8 bg-white md:rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-200 flex flex-col animate-in">
-                        
+                <div className="min-h-screen pb-12 bg-slate-50 font-sans">
+    {/* 수정된 로고 섹션: 배경색을 제거하고 여백만 활용 */}
+    <div className="w-full flex justify-center items-center pt-6 pb-0"> 
+        <div 
+            onClick={() => setActiveTab('intro')} 
+            className="cursor-pointer hover:opacity-70 transition-all active:scale-95"
+            title="사업 소개로 이동"
+        >
+            <img 
+                src="https://lh3.googleusercontent.com/d/1o5JcBhnleA3kyVZlWDtSxeOEOAlB9x01" 
+                alt="KPC 한국생산성본부"
+                className="h-10 md:h-12 w-auto object-contain mix-blend-multiply" 
+                /* mix-blend-multiply: 로고의 흰 배경을 투명하게 처리해 배경에 녹임 */
+                onError={(e) => {
+                    e.target.style.display = 'none';
+                    if (!e.target.parentNode.querySelector('.fallback-text')) {
+                        const fallback = document.createElement('h1');
+                        fallback.className = "fallback-text text-[#E51837] font-black text-2xl tracking-tighter opacity-80";
+                        fallback.innerText = "kpc 한국생산성본부";
+                        e.target.parentNode.appendChild(fallback);
+                    }
+                }}
+            />
+        </div>
+    </div>
+
+                    <div className="max-w-4xl mx-auto mt-2 md:mt-3 bg-white md:rounded-[2.5rem] shadow-xl overflow-hidden border border-slate-200 flex flex-col animate-in">
                         {/* Tab Navigation */}
                         <div className="flex border-b border-slate-100 bg-slate-50/80 sticky top-0 z-50 backdrop-blur-sm">
                             {[
@@ -549,12 +573,18 @@
                             <div className="animate-in p-6 md:p-10 min-h-[800px]">
                                 <div className="mb-8 max-w-2xl mx-auto text-slate-400 text-left">
                                     <div className="relative group mb-8">
-                                        <div className="flex justify-between items-center mb-3 px-1 text-[11px] font-black uppercase tracking-widest">
-                                            <div className="flex items-center gap-2">
-                                                <span>전체 선택</span>
-                                                <button onClick={toggleAll} className={`w-10 h-5 rounded-full relative transition-all ${isAllSelected ? 'bg-blue-600' : 'bg-slate-200'}`}><div className={`switch-dot absolute top-0.5 w-4 h-4 bg-white rounded-full transition-all ${isAllSelected ? 'left-5.5' : 'left-0.5'}`}></div></button>
-                                            </div>
-                                        </div>
+                                        <div className="flex justify-end items-center mb-2 px-1">
+    <div className="flex items-center gap-2 group cursor-pointer" onClick={toggleAll}>
+        <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest transition-colors group-hover:text-blue-600">
+            전체 선택
+        </span>
+        <button 
+            className={`w-10 h-5 rounded-full relative transition-all duration-300 ${isAllSelected ? 'bg-blue-600 shadow-md shadow-blue-100' : 'bg-slate-200'}`}
+        >
+            <div className={`switch-dot absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm transition-all duration-300 ${isAllSelected ? 'left-[22px]' : 'left-0.5'}`}></div>
+        </button>
+    </div>
+</div>
                                         <div className="relative text-slate-900 text-left">
                                             <input type="text" placeholder="검색어를 입력하세요 (공백 무시 검색 가능)" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSearch()} className="w-full pl-12 pr-14 py-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-blue-500 focus:bg-white text-base font-bold transition-all shadow-sm" />
                                             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"><SvgIcon name="search" size={20} /></div>
@@ -705,4 +735,5 @@
     </script>
 </body>
 </html>
+
 
