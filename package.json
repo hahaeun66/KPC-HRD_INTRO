@@ -1,0 +1,19 @@
+{
+  "name": "kpc-hrd-intro",
+  "version": "1.0.0",
+  "description": "KPC HRD Archive Pre-guide",
+  "scripts": {
+    "dev": "npx serve .",
+    "build": "echo 'Static site - no build required'",
+    "lint": "echo 'No linter configured for static site'"
+  },
+  "keywords": [
+    "kpc",
+    "hrd"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@vercel/analytics": "^2.0.1"
+  }
+}
