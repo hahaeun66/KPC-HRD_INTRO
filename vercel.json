@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/newsletter-admin",
+      "destination": "/index.html"
+    }
+  ]
+}
