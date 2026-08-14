@@ -359,8 +359,8 @@ wcs_do();
             // --- 뉴스레터 / Supabase ---
             // Vercel에 배포한 정적 index.html에서 Supabase를 사용합니다.
             // 아래 두 값은 Supabase Dashboard > Settings > API Keys의 Publishable key와 Project URL로 교체하세요.
-            const SUPABASE_URL = "https://sfaezygxcnpuwxplmchy.supabase.co";
-            const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_tVbIgwLsTfFqBXHX6iVgmg_eovLw7YO";
+            const SUPABASE_URL = "https://YOUR-PROJECT-REF.supabase.co";
+            const SUPABASE_PUBLISHABLE_KEY = "YOUR_SUPABASE_PUBLISHABLE_KEY";
             const SUPABASE_FUNCTION_NAME = "newsletter-admin";
 
             const supabase = window.supabase.createClient(
@@ -369,7 +369,18 @@ wcs_do();
             );
 
             const [newsletterPosts, setNewsletterPosts] = useState([]);
-            const [newsletterAdminMode, setNewsletterAdminMode] = useState(false);
+            const [newsletterAdminMode, setNewsletterAdminMode] = useState(() => {
+                try { return !!sessionStorage.getItem("kpc_newsletter_admin_token"); } catch (e) { return false; }
+            });
+            const [newsletterAdminToken, setNewsletterAdminToken] = useState(() => {
+                try { return sessionStorage.getItem("kpc_newsletter_admin_token") || ""; } catch (e) { return ""; }
+            });
+            const [newsletterAdminExpiresAt, setNewsletterAdminExpiresAt] = useState(() => {
+                try { return sessionStorage.getItem("kpc_newsletter_admin_expires_at") || ""; } catch (e) { return ""; }
+            });
+            const [showNewsletterAdminLogin, setShowNewsletterAdminLogin] = useState(false);
+            const [newsletterAdminPassword, setNewsletterAdminPassword] = useState("");
+            const [newsletterAdminError, setNewsletterAdminError] = useState("");
             const [newsletterTitle, setNewsletterTitle] = useState("");
             const [newsletterEmbedCode, setNewsletterEmbedCode] = useState("");
             const [newsletterEmbedUrl, setNewsletterEmbedUrl] = useState("");
@@ -409,9 +420,75 @@ wcs_do();
                 loadNewsletterPosts();
             }, [loadNewsletterPosts]);
 
-            const askNewsletterPassword = () => {
-                const input = window.prompt("뉴스레터 관리자 비밀번호를 입력하세요.");
-                return input;
+            useEffect(() => {
+                if (!newsletterAdminExpiresAt) return;
+
+                const expires = new Date(newsletterAdminExpiresAt).getTime();
+                const delay = expires - Date.now();
+
+                if (delay <= 0) {
+                    exitNewsletterAdmin();
+                    return;
+                }
+
+                const timer = setTimeout(() => {
+                    alert("관리자 세션이 만료되었습니다.");
+                    exitNewsletterAdmin();
+                }, delay);
+
+                return () => clearTimeout(timer);
+            }, [newsletterAdminExpiresAt]);
+
+            const openNewsletterAdminLogin = () => {
+                setNewsletterAdminPassword("");
+                setNewsletterAdminError("");
+                setShowNewsletterAdminLogin(true);
+            };
+
+            const closeNewsletterAdminLogin = () => {
+                if (newsletterLoading) return;
+                setShowNewsletterAdminLogin(false);
+                setNewsletterAdminPassword("");
+                setNewsletterAdminError("");
+            };
+
+            const handleNewsletterAdminLogin = async () => {
+                const password = newsletterAdminPassword.trim();
+
+                if (!password) {
+                    setNewsletterAdminError("비밀번호를 입력해 주세요.");
+                    return;
+                }
+
+                try {
+                    setNewsletterLoading(true);
+                    const result = await callNewsletterAdmin("login", { password });
+
+                    if (!result?.token) {
+                        throw new Error("관리자 인증에 실패했습니다.");
+                    }
+
+                    setNewsletterAdminToken(result.token);
+                    setNewsletterAdminExpiresAt(result.expires_at || "");
+                    setNewsletterAdminMode(true);
+
+                    try {
+                        sessionStorage.setItem("kpc_newsletter_admin_token", result.token);
+                        if (result.expires_at) {
+                            sessionStorage.setItem("kpc_newsletter_admin_expires_at", result.expires_at);
+                        }
+                    } catch (e) {}
+
+                    setShowNewsletterAdminLogin(false);
+                    setNewsletterAdminPassword("");
+                    setNewsletterAdminError("");
+                } catch (error) {
+                    console.error(error);
+                    setNewsletterAdminError(error.message || "비밀번호가 올바르지 않습니다.");
+                    setNewsletterAdminPassword("");
+                } finally {
+                    setNewsletterLoading(false);
+                }
             };
 
             const extractNotionIframe = (embedCode) => {
@@ -440,16 +517,18 @@ wcs_do();
                 }
             };
 
-            const callNewsletterAdmin = async (action, payload) => {
+            const callNewsletterAdmin = async (action, payload = {}) => {
+                const headers = {
+                    "Content-Type": "application/json",
+                    "apikey": SUPABASE_PUBLISHABLE_KEY,
+                    "Authorization": `Bearer ${SUPABASE_PUBLISHABLE_KEY}`
+                };
+
                 const response = await fetch(
                     `${SUPABASE_URL}/functions/v1/${SUPABASE_FUNCTION_NAME}`,
                     {
                         method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "apikey": SUPABASE_PUBLISHABLE_KEY,
-                            "Authorization": `Bearer ${SUPABASE_PUBLISHABLE_KEY}`
-                        },
+                        headers,
                         body: JSON.stringify({ action, ...payload })
                     }
                 );
@@ -468,20 +547,24 @@ wcs_do();
                 setActiveTab("newsletter");
             };
 
-            const enterNewsletterAdmin = () => {
-                const password = askNewsletterPassword();
-                if (password === null) return;
-                if (password === "1151") {
+            const openNewsletterAdmin = () => {
+                if (newsletterAdminMode) {
                     setNewsletterAdminMode(true);
                 } else {
-                    alert("비밀번호가 올바르지 않습니다.");
+                    openNewsletterAdminLogin();
                 }
             };
 
             const exitNewsletterAdmin = () => {
                 setNewsletterAdminMode(false);
+                setNewsletterAdminToken("");
+                setNewsletterAdminExpiresAt("");
                 setNewsletterTitle("");
                 setNewsletterEmbedCode("");
+                try {
+                    sessionStorage.removeItem("kpc_newsletter_admin_token");
+                    sessionStorage.removeItem("kpc_newsletter_admin_expires_at");
+                } catch (e) {}
             };
 
             const addNewsletterPost = async () => {
@@ -498,17 +581,15 @@ wcs_do();
                     return;
                 }
 
-                // 브라우저에 비밀번호를 하드코딩하지 않고, 함수에서 검증할 수 있도록 다시 입력받습니다.
-                const password = askNewsletterPassword();
-                if (password !== "1151") {
-                    if (password !== null) alert("비밀번호가 올바르지 않습니다.");
+                if (!newsletterAdminMode || !newsletterAdminToken) {
+                    openNewsletterAdminLogin();
                     return;
                 }
 
                 try {
                     setNewsletterLoading(true);
                     await callNewsletterAdmin("create", {
-                        password,
+                        token: newsletterAdminToken,
                         title,
                         embed_url: embedUrl
                     });
@@ -531,10 +612,8 @@ wcs_do();
             };
 
             const handleNewsletterTitleDelete = async (post) => {
-                const password = askNewsletterPassword();
-                if (password === null) return;
-                if (password !== "1151") {
-                    alert("비밀번호가 올바르지 않습니다.");
+                if (!newsletterAdminMode || !newsletterAdminToken) {
+                    openNewsletterAdminLogin();
                     return;
                 }
 
@@ -544,7 +623,7 @@ wcs_do();
                 try {
                     setNewsletterLoading(true);
                     await callNewsletterAdmin("delete", {
-                        password,
+                        token: newsletterAdminToken,
                         id: post.id
                     });
 
@@ -937,15 +1016,11 @@ wcs_do();
                             <div className="animate-in min-h-[800px] bg-slate-50">
                                 <div className="px-6 md:px-10 py-8 bg-white border-b border-slate-100">
                                     <div className="max-w-5xl mx-auto flex flex-col md:flex-row md:items-end justify-between gap-4">
-                                        <div
-                                            className="text-left cursor-pointer select-none"
-                                            onClick={enterNewsletterAdmin}
-                                            title="관리자"
-                                        >
+                                        <div className="text-left select-none">
                                             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-50 text-[#E51837] border border-red-100 text-[10px] font-black uppercase tracking-widest">
                                                 <SvgIcon name="mail" size={13} /> KPC Newsletter
                                             </div>
-                                            <h2 className="mt-3 text-2xl md:text-3xl font-black tracking-tight text-slate-900 hover:text-[#E51837] transition-colors">
+                                            <h2 className="mt-3 text-2xl md:text-3xl font-black tracking-tight text-slate-900">
                                                 뉴스레터
                                             </h2>
                                             <p className="mt-2 text-xs md:text-sm text-slate-500 font-medium">
@@ -956,14 +1031,24 @@ wcs_do();
                                             )}
                                         </div>
 
-                                        {newsletterAdminMode && (
-                                            <button
-                                                onClick={exitNewsletterAdmin}
-                                                className="px-4 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-black hover:bg-slate-800 transition-all active:scale-95"
-                                            >
-                                                관리자 닫기
-                                            </button>
-                                        )}
+                                        <div className="flex items-center gap-2 shrink-0">
+                                            {newsletterAdminMode ? (
+                                                <button
+                                                    onClick={exitNewsletterAdmin}
+                                                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-black hover:bg-slate-800 transition-all active:scale-95"
+                                                >
+                                                    관리자 모드 종료
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={openNewsletterAdmin}
+                                                    className="inline-flex items-center gap-2 px-3 py-2 text-[10px] font-black text-slate-400 hover:text-slate-700 transition-colors"
+                                                    title="관리자"
+                                                >
+                                                    관리자
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
 
@@ -971,7 +1056,7 @@ wcs_do();
                                     <div className="px-6 md:px-10 pt-6">
                                         <div className="max-w-5xl mx-auto bg-white border border-red-100 rounded-2xl p-5 md:p-6 shadow-sm">
                                             <div className="text-left mb-5">
-                                                <h3 className="text-sm font-black text-slate-900">뉴스레터 글쓰기</h3>
+                                                <h3 className="text-sm font-black text-slate-900">관리자 · 뉴스레터 글쓰기</h3>
                                                 <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
                                                     Notion에서 <b>공유 → 게시 → 이 페이지 임베드하기 → 코드 복사</b>를 한 뒤,
                                                     복사된 <b>&lt;iframe ...&gt;</b> 전체 코드를 붙여 넣어 주세요.
@@ -1029,9 +1114,9 @@ wcs_do();
                                                             }`}
                                                         >
                                                             <button
-                                                                onClick={() => handleNewsletterTitleDelete(post)}
-                                                                className="w-full text-left px-5 pt-4 pb-1 hover:bg-red-50/40 transition-all group"
-                                                                title="제목을 클릭하면 관리자 비밀번호를 확인합니다."
+                                                                onClick={() => openNewsletterPost(post)}
+                                                                className="w-full text-left px-5 pt-4 pb-1 hover:bg-slate-50 transition-all group"
+                                                                title="뉴스레터 열람"
                                                             >
                                                                 <p className={`text-[13px] font-black leading-snug group-hover:text-[#E51837] ${
                                                                     newsletterEmbedUrl === post.embedUrl ? 'text-[#E51837]' : 'text-slate-800'
@@ -1040,14 +1125,23 @@ wcs_do();
                                                                 </p>
                                                             </button>
 
-                                                            <div
-                                                                onClick={() => openNewsletterPost(post)}
-                                                                className="px-5 pb-4 pt-1 cursor-pointer hover:bg-slate-50 transition-all"
-                                                                title="클릭하면 뉴스레터 열람"
-                                                            >
-                                                                <span className="text-[10px] text-slate-400">
+                                                            <div className="px-5 pb-4 pt-1 flex items-center justify-between gap-2">
+                                                                <span
+                                                                    onClick={() => openNewsletterPost(post)}
+                                                                    className="text-[10px] text-slate-400 cursor-pointer hover:text-slate-600 transition-colors"
+                                                                    title="뉴스레터 보기"
+                                                                >
                                                                     {new Date(post.createdAt).toLocaleDateString('ko-KR')} · 뉴스레터 보기
                                                                 </span>
+
+                                                                {newsletterAdminMode && (
+                                                                    <button
+                                                                        onClick={() => handleNewsletterTitleDelete(post)}
+                                                                        className="text-[10px] font-black text-slate-300 hover:text-[#E51837] transition-colors"
+                                                                    >
+                                                                        삭제
+                                                                    </button>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     ))
@@ -1083,6 +1177,76 @@ wcs_do();
                                 </div>
                             </div>
                         )}
+
+                    {/* 뉴스레터 관리자 인증 모달 */}
+                    {showNewsletterAdminLogin && (
+                        <div className="fixed inset-0 z-[130] flex items-center justify-center p-5">
+                            <div
+                                className="absolute inset-0 bg-slate-900/70 backdrop-blur-sm"
+                                onClick={closeNewsletterAdminLogin}
+                            ></div>
+
+                            <div className="relative w-full max-w-sm bg-white rounded-[2rem] shadow-2xl border border-white/60 overflow-hidden animate-in">
+                                <div className="px-7 pt-7 pb-5 text-left">
+                                    <div className="w-12 h-12 rounded-2xl bg-[#E51837] text-white flex items-center justify-center shadow-lg shadow-red-100 mb-5">
+                                        <SvgIcon name="lock" size={22} />
+                                    </div>
+
+                                    <h3 className="text-xl font-black text-slate-900 tracking-tight">관리자 모드</h3>
+                                    <p className="mt-2 text-xs leading-relaxed text-slate-400">
+                                        뉴스레터를 관리하려면 관리자 비밀번호를 입력해 주세요.
+                                    </p>
+                                </div>
+
+                                <div className="px-7 pb-7">
+                                    <div className={`relative rounded-2xl border-2 transition-all ${
+                                        newsletterAdminError
+                                            ? 'border-red-200 bg-red-50/30'
+                                            : 'border-slate-100 bg-slate-50 focus-within:border-[#E51837] focus-within:bg-white'
+                                    }`}>
+                                        <input
+                                            autoFocus
+                                            type="password"
+                                            inputMode="numeric"
+                                            autoComplete="off"
+                                            value={newsletterAdminPassword}
+                                            onChange={(e) => {
+                                                setNewsletterAdminPassword(e.target.value);
+                                                if (newsletterAdminError) setNewsletterAdminError("");
+                                            }}
+                                            onKeyDown={(e) => {
+                                                if (e.key === "Enter") handleNewsletterAdminLogin();
+                                                if (e.key === "Escape") closeNewsletterAdminLogin();
+                                            }}
+                                            placeholder="비밀번호"
+                                            className="w-full bg-transparent px-4 py-4 pr-12 outline-none text-center text-lg tracking-[0.35em] font-black text-slate-800 placeholder:text-slate-300 placeholder:tracking-normal"
+                                        />
+                                    </div>
+
+                                    {newsletterAdminError && (
+                                        <p className="mt-2 px-1 text-[11px] font-bold text-[#E51837] text-center">
+                                            {newsletterAdminError}
+                                        </p>
+                                    )}
+
+                                    <div className="grid grid-cols-2 gap-2 mt-5">
+                                        <button
+                                            onClick={closeNewsletterAdminLogin}
+                                            className="py-3.5 rounded-xl bg-slate-100 text-slate-500 text-xs font-black hover:bg-slate-200 transition-all"
+                                        >
+                                            취소
+                                        </button>
+                                        <button
+                                            onClick={handleNewsletterAdminLogin}
+                                            className="py-3.5 rounded-xl bg-[#E51837] text-white text-xs font-black hover:bg-[#c41530] transition-all active:scale-95 shadow-lg shadow-red-100"
+                                        >
+                                            관리자 모드 시작
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     {/* 상세보기 모달 */}
                     {selectedCourseDetail && (
