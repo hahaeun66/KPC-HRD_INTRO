@@ -356,7 +356,7 @@ wcs_do();
             const [calcEnterpriseType, setCalcEnterpriseType] = useState('preferred');
             const [calcParticipants, setCalcParticipants] = useState(1);
 
-            // --- 뉴스레터 / Supabase ---
+           // --- 뉴스레터 / Supabase ---
             // Vercel에 배포한 정적 index.html에서 Supabase를 사용합니다.
             // 아래 두 값은 Supabase Dashboard > Settings > API Keys의 Publishable key와 Project URL로 교체하세요.
             const SUPABASE_URL = "https://sfaezygxcnpuwxplmchy.supabase.co";
@@ -555,12 +555,22 @@ wcs_do();
                 }
             };
 
-            const exitNewsletterAdmin = () => {
+            const exitNewsletterAdmin = async () => {
+                const token = newsletterAdminToken;
+                try {
+                    if (token && !SUPABASE_URL.includes("YOUR-PROJECT-REF")) {
+                        await callNewsletterAdmin("logout", { token });
+                    }
+                } catch (e) {
+                    console.warn("관리자 세션 종료 요청 실패", e);
+                }
+
                 setNewsletterAdminMode(false);
                 setNewsletterAdminToken("");
                 setNewsletterAdminExpiresAt("");
                 setNewsletterTitle("");
                 setNewsletterEmbedCode("");
+
                 try {
                     sessionStorage.removeItem("kpc_newsletter_admin_token");
                     sessionStorage.removeItem("kpc_newsletter_admin_expires_at");
